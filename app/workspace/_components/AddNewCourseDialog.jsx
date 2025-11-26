@@ -17,10 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Sparkle } from "lucide-react";
+import { Loader2Icon, Sparkle } from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
+import { v4 as uuidv4 } from 'uuid'
+import { useRouter } from "next/navigation";
 
 const AddNewCourseDialog = ({ children }) => {
+  const [loading, setLoading] = useState(false)  
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -29,17 +33,33 @@ const AddNewCourseDialog = ({ children }) => {
     category: "",
     level: "",
   });
+  const router = useRouter()
 
   const onHandleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    console.log(formData);
+    // console.log(formData);
   };
 
-  const onGenerate = () => {
+  const onGenerate = async () => {
     console.log(formData);
+    setLoading(true)
+    const courseId = uuidv4();
+
+    try {
+        const res = await axios.post("/api/generate-course-layout", {
+          ...formData,
+          courseId: courseId
+        });
+        console.log(res.data);
+        router.push("/workspace/edit-course" + res?.data?.courseId)
+    } catch (error) {
+        console.log(error)
+    } finally {
+        setLoading(false)
+    }
   };
 
   return (
@@ -120,9 +140,16 @@ const AddNewCourseDialog = ({ children }) => {
                 <Button
                   className={"w-full cursor-pointer active:scale-98"}
                   onClick={onGenerate}
+                  disabled={loading}
                 >
                   {" "}
-                  <Sparkle /> Generate Course
+                  {loading ? (
+                    <Loader2Icon className="animate-spin" />
+                  ) : (
+                    <>
+                      <Sparkle /> Generate Course
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
