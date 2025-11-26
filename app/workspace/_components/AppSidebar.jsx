@@ -23,6 +23,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AddNewCourseDialog from "./AddNewCourseDialog";
 
 const SideBarOptions = [
   {
@@ -68,7 +69,9 @@ const AppSidebar = () => {
 
       <SidebarContent>
         <SidebarGroup>
-          <Button>Create New Course</Button>
+          <AddNewCourseDialog>
+            <Button className={'cursor-pointer hover:scale-102 active:scale-97 transition-all duration-300'}>Create New Course</Button>
+          </AddNewCourseDialog>
         </SidebarGroup>
 
         <SidebarGroup>
@@ -76,9 +79,15 @@ const AppSidebar = () => {
             <SidebarMenu>
               {SideBarOptions.map((item, index) => (
                 <SidebarMenuItem key={index}>
-                  <SidebarMenuButton asChild className={'p-5'}>
-                    <Link href={item.path} className={`text-[17px]
-                      ${path.includes(item.path) && 'text-muted-foreground bg-purple-100'}`}>
+                  <SidebarMenuButton asChild className={"p-5"}>
+                    <Link
+                      href={item.path}
+                      className={`text-[17px]
+                      ${
+                        path.includes(item.path) &&
+                        "text-muted-foreground bg-purple-100"
+                      }`}
+                    >
                       <item.icon className="h-7 w-7" />
                       <span className="font-sans">{item.title}</span>
                     </Link>
@@ -88,7 +97,6 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
       </SidebarContent>
       <SidebarFooter />
     </Sidebar>

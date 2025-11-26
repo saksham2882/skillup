@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
+import AddNewCourseDialog from "./AddNewCourseDialog"
 
 const CourseList = () => {
     const [CourseList, setCourseList] = useState([])
@@ -19,10 +20,13 @@ const CourseList = () => {
           <h2 className="my-4 text-xl font-bold">
             Look like you haven&apos;t created any course yet{" "}
           </h2>
-          <Button>
-            <Plus />
-            Create your first Course
-          </Button>
+
+          <AddNewCourseDialog>
+            <Button className={'cursor-pointer hover:scale-102 active:scale-97 transition-all duration-300'}>
+              <Plus />
+              Create your first Course
+            </Button>
+          </AddNewCourseDialog>
         </div>
       ) : (
         <div>List of Courses</div>
