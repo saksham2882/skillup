@@ -54,7 +54,7 @@ const AddNewCourseDialog = ({ children }) => {
           courseId: courseId
         });
         console.log(res.data);
-        router.push("/workspace/edit-course" + res?.data?.courseId)
+        router.push("/workspace/edit-course/" + res?.data?.courseId)
     } catch (error) {
         console.log(error)
     } finally {

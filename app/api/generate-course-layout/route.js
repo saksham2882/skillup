@@ -2,6 +2,7 @@ import { db } from "@/config/db";
 import { coursesTable } from "@/config/schema";
 import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
+import axios from "axios";
 import { NextResponse } from "next/server";
 
 const PROMPT = `
@@ -14,6 +15,7 @@ const PROMPT = `
           "level": "string",
           "includeVideo": "boolean",
           "noOfChapters": "number",
+          "bannerImagePrompt": "string",
           "chapters": [
             { 
                "chapterName": "string",
@@ -65,14 +67,39 @@ export async function POST(req) {
     const RawResponse = res?.candidates[0]?.content?.parts[0]?.text
     const RawJson = RawResponse.replace('```json', '').replace('```', '');
     const JSONResponse = JSON.parse(RawJson)
+    const ImagePrompt = JSONResponse.course?.bannerImagePrompt
+
+    // Generate Image
+    const bannerImageURL = await GenerateImage(ImagePrompt)
 
     // save content to database
     const result = await db.insert(coursesTable).values({
         ...formData,
         courseJson: JSONResponse,
         userEmail: user?.primaryEmailAddress.emailAddress,
-        cid: courseId
+        cid: courseId,
+        bannerImageUrl: bannerImageURL
     })
 
     return NextResponse.json({courseId: courseId})
+}
+
+
+const GenerateImage = async (imagePrompt) => {
+    const BASE_URL = 'https://aigurulab.tech';
+    const res = await axios.post(BASE_URL + '/api/generate-image', {
+        width: 1024,
+        height: 1024,
+        input: imagePrompt,
+        model: 'flux',
+        aspectRatio: "16:9"
+    },{
+        headers: {
+            'x-api-key': process.env.AI_GURU_LAB_API,
+            'Content-Type': 'application/json',
+        }
+    })
+
+    console.log(res.data.image)
+    return res.data.image     // return image URL
 }
