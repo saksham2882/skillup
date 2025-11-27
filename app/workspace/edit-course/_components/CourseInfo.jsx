@@ -1,9 +1,29 @@
+"use client"
 import { Button } from "@/components/ui/button";
-import { BookAIcon, Clock, Settings, TrendingUp } from "lucide-react";
+import axios from "axios";
+import { BookAIcon, Clock, Loader2Icon, Settings, TrendingUp } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 const CourseInfo = ({ course }) => {
   const courseLayout = course?.courseJson?.course;
+  const [loading, setLoading] = useState(false)
+
+  const GenerateCourseContent = async () => {
+    setLoading(true)
+    try {
+      const res = await axios.post('/api/generate-course-content', {
+        courseJson: courseLayout,
+        courseTitle: course?.name,
+        courseId: course?.cid
+      })
+      console.log("Course Content: ", res.data)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="flex flex-col md:flex-row gap-5 p-5 rounded-2xl shadow-sm w-full bg-white">
@@ -49,9 +69,19 @@ const CourseInfo = ({ course }) => {
           </div>
         </div>
 
-        <Button className="mt-3 max-w-sm gap-2">
-          <Settings className="w-5 h-5" />
-          Generate Content
+        <Button 
+          className="mt-3 max-w-sm gap-2 cursor-pointer" 
+          onClick={GenerateCourseContent}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <>
+              <Settings className="w-5 h-5" />
+              Generate Content
+            </>
+          )}
         </Button>
       </div>
 
