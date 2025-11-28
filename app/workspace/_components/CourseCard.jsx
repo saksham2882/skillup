@@ -1,10 +1,37 @@
 import { Button } from "@/components/ui/button"
-import { BookAudio, PlayCircle, Settings } from "lucide-react"
+import axios from "axios"
+import { BookAudio, LoaderCircle, PlayCircle, Settings } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
+import { toast } from "sonner"
 
 const CourseCard = ({course}) => {
     const courseJson = course?.courseJson.course
+    const [loading, setLoading] = useState(false)
+
+    const onEnrollCourse = async () => {
+        setLoading(true)
+        try {
+            const res = await axios.post("/api/enroll-course", {
+              courseId: course?.cid,
+            });
+
+            console.log(res.data)
+            if(res.data.response){
+                toast.warning('Already Enrolled!')
+                return;
+            }else{
+                toast.success('Enrolled!')
+            }
+        } catch (error) {
+            toast.error('Server Side Error. Try Again!')
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
   return (
     <div className="shadow-sm rounded-xl hover:shadow-lg hover:scale-101 transition-all duration-300">
         <Image 
@@ -30,9 +57,20 @@ const CourseCard = ({course}) => {
                 
                 {
                     course?.courseContent?.length ? (
-                        <Button className="cursor-pointer" size={'sm'}>
-                            <PlayCircle />
-                            Start Learning
+                        <Button 
+                            className="cursor-pointer" 
+                            size={'sm'}
+                            onClick={onEnrollCourse}
+                            disabled={loading}
+                        >
+                            { loading ? (
+                                <LoaderCircle className="animate-spin" /> 
+                            ) : (
+                                <>
+                                    <PlayCircle />
+                                    Enroll Course
+                                </>
+                            )}
                         </Button>
                     ) : (
                         <Link href={'/workspace/edit-course/' + course?.cid}>
