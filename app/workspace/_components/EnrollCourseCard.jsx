@@ -37,7 +37,7 @@ const EnrollCourseCard = ({ course, enrollCourse }) => {
                 </h2>
                 <Progress value={CalculateProgress()} />
 
-                <Link href={`/workspace/course/${course?.cid}`}>
+                <Link href={`/workspace/view-course/${course?.cid}`}>
                     <Button className={'w-full mt-3 cursor-pointer'}>
                         <PlayCircle />
                         Continue Learning 

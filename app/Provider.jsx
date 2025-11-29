@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
+import { SelectedChapterIndexContext } from "@/context/SelectedChapterIndex"
 import { UserDetailContext } from "@/context/UserContext"
 import { useUser } from "@clerk/nextjs"
 import axios from "axios"
@@ -10,6 +11,7 @@ const Provider = ({children}) => {
 
     const { user } = useUser()
     const [userData, setUserData] = useState();
+    const [selectedChapterIndex, setSelectedChapterIndex] = useState(0)
 
     const createUser = async() => {
         const res = await axios.post('/api/user', {
@@ -27,7 +29,9 @@ const Provider = ({children}) => {
 
   return (
     <UserDetailContext.Provider value={{userData, setUserData}}>
-        {children}
+        <SelectedChapterIndexContext.Provider value={{selectedChapterIndex, setSelectedChapterIndex}}>
+            {children}
+        </SelectedChapterIndexContext.Provider>
     </UserDetailContext.Provider>
   )
 }
