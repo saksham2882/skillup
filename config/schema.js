@@ -1,3 +1,4 @@
+import { index } from "drizzle-orm/pg-core";
 import {
     integer,
     pgTable,
@@ -13,7 +14,7 @@ export const usersTable = pgTable("users", {
     email: varchar("email", { length: 255 }).notNull().unique(),
     subscriptionId: varchar("subscriptionId", { length: 255 }),
     createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
 });
 
 export const coursesTable = pgTable("courses", {
@@ -40,8 +41,15 @@ export const coursesTable = pgTable("courses", {
         .notNull(),
 
     createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+
+}, (table) => {
+    return {
+        cidIndex: index("cid_idx").on(table.cid),
+        userIndex: index("user_idx").on(table.userEmail)
+    };
 });
+
 
 export const enrollCourseTable = pgTable("enrollCourse", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -56,4 +64,10 @@ export const enrollCourseTable = pgTable("enrollCourse", {
     completedChapters: json("completedChapters").default([]),
 
     createdAt: timestamp("created_at").defaultNow(),
+
+}, (table) => {
+    return {
+        cidIndex: index("enroll_cid_idx").on(table.cid),
+        userIndex: index("enroll_user_idx").on(table.userEmail)
+    }
 });
