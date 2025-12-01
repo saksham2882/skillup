@@ -1,9 +1,10 @@
 import { SignIn } from "@clerk/nextjs";
+import Background from "../../_components/Background";
 
 export default function Page() {
   return (
-    <div className="bg-black/40 h-screen flex items-center justify-center">
+    <Background>
       <SignIn />
-    </div>
+    </Background>
   );
 }
