@@ -17,13 +17,15 @@ import {
   Compass,
   LayoutDashboard,
   PencilRulerIcon,
+  Sparkles,
   UserCircle2Icon,
   WalletCards,
+  Zap
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AddNewCourseDialog from "./AddNewCourseDialog";
+import { motion } from "framer-motion";
 
 const SideBarOptions = [
   {
@@ -69,52 +71,86 @@ const AppSidebar = () => {
   }
 
   return (
-    <Sidebar>
-      <SidebarHeader className={"p-4"}>
-        <Image src={"/logo.svg"} alt="SkillUp AI" width={140} height={140} />
+    <Sidebar className="border-r border-white/5 bg-slate-950">
+      {/* -------- Header -------- */}
+      <SidebarHeader className="p-6 pb-2">
+        <Link href="/workspace" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 bg-linear-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+            <Sparkles className="text-white w-6 h-6" />
+          </div>
+
+          <span className="font-bold text-xl text-white tracking-tight group-hover:text-cyan-400 transition-colors">
+            SkillUp AI
+          </span>
+        </Link>
       </SidebarHeader>
 
-      <SidebarContent>
+      {/* --------- Main Content ------------- */}
+      <SidebarContent className="px-4 py-6">
         <SidebarGroup>
           <AddNewCourseDialog>
-            <Button
-              className={
-                "cursor-pointer hover:scale-102 active:scale-97 transition-all duration-300"
-              }
-            >
-              Create New Course
+            <Button className="w-full btn-primary font-semibold tracking-wide">
+              <Zap className="w-4 h-4 mr-2" /> Create New Course
             </Button>
           </AddNewCourseDialog>
         </SidebarGroup>
 
-        <hr />
+        <div className="h-4" />
 
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {SideBarOptions.map((item, index) => (
-                <SidebarMenuItem key={index}>
-                  <SidebarMenuButton asChild className={"p-5 rounded-lg"}>
-                    <Link
-                      href={item.path}
-                      className={`text-[17px] flex items-center gap-3 hover:shadow-md
-                      ${
-                        isActive(item.path)
-                          ? "bg-purple-200 shadow-md"
-                          : "text-muted-foreground"
-                      }`}
+            <SidebarMenu className="space-y-1">
+              {SideBarOptions.map((item, index) => {
+                const active = isActive(item.path);
+                return (
+                  <SidebarMenuItem key={index}>
+                    <SidebarMenuButton
+                      asChild
+                      className="p-0 overflow-hidden rounded-xl"
                     >
-                      <item.icon className="h-7 w-7" />
-                      <span className="font-sans">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                      <Link
+                        href={item.path}
+                        className={`
+                          relative flex items-center gap-3 px-4 py-3.5 text-sm font-medium transition-all duration-300
+                          ${active
+                            ? "text-cyan-400 bg-cyan-950/30"
+                            : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"
+                          }
+                        `}
+                      >
+                        {active && (
+                          <motion.div
+                            layoutId="active-pill"
+                            className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 rounded-r-full"
+                          />
+                        )}
+                        <item.icon
+                          className={`h-5 w-5 ${active ? "text-cyan-400" : "text-slate-500"
+                            }`}
+                        />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+
+      {/* -------- Footer ----------- */}
+      <SidebarFooter className="p-6 border-t border-white/5">
+        <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5">
+          <h4 className="text-xs font-semibold text-slate-300 mb-1">
+            Subscribe Pro Plan
+          </h4>
+          <p className="text-[10px] text-slate-500 mb-3">to get Unlimited AI use</p>
+          <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-full w-[40%] bg-linear-to-r from-cyan-500 to-blue-500 rounded-full"></div>
+          </div>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };

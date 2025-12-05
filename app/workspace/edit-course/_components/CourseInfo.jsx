@@ -1,7 +1,8 @@
 "use client"
+
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { BookAIcon, Clock, Loader2Icon, PlayCircle, Settings, TrendingUp } from "lucide-react";
+import { BookOpen, Clock, Loader2Icon, PlayCircle, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ const CourseInfo = ({ course, viewCourse }) => {
   const courseLayout = course?.courseJson?.course;
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const bannerImageUrl = course?.bannerImageUrl || '/learning.svg'
 
   const GenerateCourseContent = async () => {
     setLoading(true)
@@ -21,98 +23,108 @@ const CourseInfo = ({ course, viewCourse }) => {
         courseTitle: course?.name,
         courseId: course?.cid
       })
-      console.log("Course Content: ", res.data)
       router.replace('/workspace')
-      toast.success("Course Generated Successfully")
+      toast.success("Course Content Generated Successfully!");
     } catch (error) {
       console.log(error)
-      toast.error("Server Side Error, Try Again!")
+      toast.error("Generation failed. Please try again.");
     } finally {
       setLoading(false)
     }
   }
 
+
   return (
-    <div className="flex flex-col md:flex-row gap-5 p-5 rounded-2xl shadow-sm w-full bg-white">
+    <div className="flex flex-col md:flex-row gap-8 p-6 lg:p-8 rounded-3xl bg-slate-900/50 border border-white/5 shadow-2xl">
+      {/* ---------- Banner Image ---------- */}
+      <div className="w-full md:w-1/3 relative h-[250px] md:h-auto rounded-2xl overflow-hidden shadow-lg border border-white/10">
+        <Image
+          src={bannerImageUrl}
+          alt={course?.name}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
 
-      <div className="flex flex-col gap-4 flex-1 min-w-0">
-        <h2 className="font-bold text-2xl md:text-3xl">
+      {/* ------------ Details ----------- */}
+      <div className="flex flex-col gap-5 flex-1 justify-center">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+              {course?.category || "Education"}
+            </span>
+            <span className="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider">
+              {course?.level}
+            </span>
+          </div>
+
+          <h2 className="font-bold text-3xl md:text-4xl text-white mb-4">
             {courseLayout?.name}
-        </h2>
+          </h2>
 
-        <p className="text-gray-600 line-clamp-3">
-          {courseLayout?.description}
-        </p>
+          <p className="text-slate-400 text-lg leading-relaxed line-clamp-3">
+            {courseLayout?.description}
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="flex gap-4 items-center p-3 rounded-xl shadow-sm bg-gray-50">
-            <Clock className="text-blue-500 w-6 h-6 shrink-0" />
-            <section className="min-w-0">
-              <h2 className="font-medium text-gray-600">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+          <div className="flex items-center gap-3 text-slate-300">
+            <div className="p-2 rounded-lg bg-slate-800 text-blue-400">
+              <Clock size={20} />
+            </div>
+
+            <div>
+              <div className="text-xs text-slate-500">
                 Duration
-              </h2>
-              <h2 className="font-semibold">{course?.duration || "1 hour"}</h2>
-            </section>
+              </div>
+              <div className="font-semibold">
+                {course?.duration || "2h 30m"}
+              </div>
+            </div>
           </div>
 
-          <div className="flex gap-4 items-center p-3 rounded-xl shadow-sm bg-gray-50">
-            <BookAIcon className="text-green-500 w-6 h-6 shrink-0" />
-            <section className="min-w-0">
-              <h2 className="font-medium text-gray-600">
+          <div className="flex items-center gap-3 text-slate-300">
+            <div className="p-2 rounded-lg bg-slate-800 text-purple-400">
+              <BookOpen size={20} />
+            </div>
+            
+            <div>
+              <div className="text-xs text-slate-500">
                 Chapters
-              </h2>
-              <h2 className="font-semibold">{course?.noOfChapters}</h2>
-            </section>
-          </div>
-
-          <div className="flex gap-4 items-center p-3 rounded-xl shadow-sm bg-gray-50">
-            <TrendingUp className="text-red-500 w-6 h-6 shrink-0" />
-            <section className="min-w-0">
-              <h2 className="font-medium text-gray-600 ">
-                Difficulty
-              </h2>
-              <h2 className="font-semibold">{course?.level}</h2>
-            </section>
+              </div>
+              <div className="font-semibold">
+                {course?.noOfChapters} Chapters
+              </div>
+            </div>
           </div>
         </div>
 
-        {!viewCourse ? (
-          <>
+        <div className="mt-4 pt-6 border-t border-white/5">
+          {!viewCourse ? (
             <Button
-              className="mt-3 max-w-sm gap-2 cursor-pointer"
+              className="w-full md:w-auto btn-primary h-12 text-md"
               onClick={GenerateCourseContent}
               disabled={loading}
             >
               {loading ? (
-                <Loader2Icon className="animate-spin" />
+                <>
+                  <Loader2Icon className="animate-spin mr-2" /> Generating
+                  Content...
+                </>
               ) : (
                 <>
-                  <Settings className="w-5 h-5" />
-                  Generate Content
+                  <RefreshCw className="mr-2 h-4 w-4" /> Generate Course Content
                 </>
               )}
             </Button>
-          </>
-        ) : (
-          <Link href={`/course/${course?.cid}`}>
-            <Button>
-              <PlayCircle />
-              Continue Learning
-            </Button>
-          </Link>
-        )}
-      </div>
-
-      <div className="w-full md:w-1/3">
-        <div className="relative w-full h-48 md:h-full rounded-xl overflow-hidden">
-          <Image
-            src={course?.bannerImageUrl}
-            alt={course?.name + " Banner"}
-            fill
-            className="object-cover"
-            priority
-            loading="eager"
-          />
+          ) : (
+            <Link href={`/course/${course?.cid}`}>
+              <Button className="w-full md:w-auto btn-primary h-12 text-md">
+                <PlayCircle className="mr-2 h-5 w-5" /> Start Learning Now
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

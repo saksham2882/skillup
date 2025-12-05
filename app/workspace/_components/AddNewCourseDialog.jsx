@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, Sparkle } from "lucide-react";
+import { Loader2Icon, Sparkles, VideoIcon } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid'
@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const AddNewCourseDialog = ({ children }) => {
-  const [loading, setLoading] = useState(false)  
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -41,125 +41,171 @@ const AddNewCourseDialog = ({ children }) => {
       ...prev,
       [field]: value,
     }));
-    // console.log(formData);
   };
 
   const onGenerate = async () => {
-    console.log(formData);
+    if (!formData.name || !formData.category || !formData.level) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     setLoading(true)
     const courseId = uuidv4();
 
     try {
-        const res = await axios.post("/api/generate-course-layout", {
-          ...formData,
-          courseId: courseId
-        });
-        
-        if(res?.data?.response == 'Limit Exceed'){
-          router.push('/workspace/billing')
-          toast.warning('Please Subscribe to Plan!')
-        }
-        router.push("/workspace/edit-course/" + res?.data?.courseId)
+      const res = await axios.post("/api/generate-course-layout", {
+        ...formData,
+        courseId: courseId
+      });
+
+      if (res?.data?.response == 'Limit Exceed') {
+        router.push('/workspace/billing')
+        toast.warning("Plan Limit Exceeded. Please Upgrade!");
+        return;
+      }
+
+      toast.success("Course Layout Generated!");
+      router.push("/workspace/edit-course/" + res?.data?.courseId)
     } catch (error) {
-        console.log(error)
+      toast.error("Failed to generate course. Please try again.");
+      console.log(error)
     } finally {
-        setLoading(false)
+      setLoading(false)
     }
   };
 
   return (
     <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="bg-slate-900 border-white/10 sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create New Course Using AI</DialogTitle>
-          <DialogDescription asChild>
-            <div className="flex flex-col gap-4 mt-4">
-              <div className="flex flex-col gap-2">
-                <label>Course Name</label>
-                <Input
-                  placeholder="Enter Course Name"
-                  onChange={(e) => onHandleInputChange("name", e?.target.value)}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label>Course Description (Optional)</label>
-                <Textarea
-                  placeholder="Enter Course Description"
-                  onChange={(e) =>
-                    onHandleInputChange("description", e?.target.value)
-                  }
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label>No. Of Chapters</label>
-                <Input
-                  placeholder="Enter No. of Chapters"
-                  type="number"
-                  onChange={(e) =>
-                    onHandleInputChange("noOfChapters", e?.target.value)
-                  }
-                />
-              </div>
-
-              <div className="flex gap-3 items-center">
-                <label>Include Video</label>
-                <Switch
-                  onCheckedChange={() =>
-                    onHandleInputChange("includeVideo", !formData?.includeVideo)
-                  }
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label>Difficulty Level</label>
-                <Select
-                  className="mt-1"
-                  onValueChange={(value) => onHandleInputChange("level", value)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Difficulty Level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="moderate">Moderate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label>Category</label>
-                <Input
-                  placeholder="Category (Separated by Comma)"
-                  onChange={(e) =>
-                    onHandleInputChange("category", e?.target.value)
-                  }
-                />
-              </div>
-
-              <div className="mt-5">
-                <Button
-                  className={"w-full cursor-pointer active:scale-98"}
-                  onClick={onGenerate}
-                  disabled={loading}
-                >
-                  {" "}
-                  {loading ? (
-                    <Loader2Icon className="animate-spin" />
-                  ) : (
-                    <>
-                      <Sparkle /> Generate Course
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
+          <DialogTitle className="text-2xl text-white">
+            Create New Course
+          </DialogTitle>
+          <DialogDescription className="text-slate-400">
+            Let our AI craft a personalized learning path for you.
           </DialogDescription>
         </DialogHeader>
+
+        <div className="flex flex-col gap-5 mt-4">
+          {/* ----------- Course Name ------------- */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">
+              Topic or Title
+            </label>
+            <Input
+              className="ai-input"
+              placeholder="e.g. Python for Data Science"
+              onChange={(e) => onHandleInputChange("name", e?.target.value)}
+            />
+          </div>
+
+          {/* ---------- Description ------------ */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">
+              Description (Optional)
+            </label>
+            <Textarea
+              className="ai-input min-h-[100px]"
+              placeholder="What specific areas do you want to cover?"
+              onChange={(e) =>
+                onHandleInputChange("description", e?.target.value)
+              }
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* ------------ Level ----------- */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">
+                Difficulty
+              </label>
+              <Select
+                onValueChange={(value) => onHandleInputChange("level", value)}
+              >
+                <SelectTrigger className="ai-input">
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="moderate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* ------------ Duration/Chapters ------------- */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">
+                Chapters
+              </label>
+              <Input
+                type="number"
+                className="ai-input"
+                placeholder="Ex. 5"
+                min={1}
+                max={10}
+                onChange={(e) =>
+                  onHandleInputChange("noOfChapters", e?.target.value)
+                }
+              />
+            </div>
+          </div>
+
+          {/* ------------ Category ------------ */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">
+              Category
+            </label>
+            <Input
+              className="ai-input"
+              placeholder="Tech, Health, Art..."
+              onChange={(e) => onHandleInputChange("category", e?.target.value)}
+            />
+          </div>
+
+          {/* --------------- Toggle --------------- */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950/30 border border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400">
+                <VideoIcon size={18} />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-white">
+                  Include Video Tutorials
+                </div>
+                <div className="text-xs text-slate-500">
+                  AI will curate relevant videos
+                </div>
+              </div>
+            </div>
+            <Switch
+              onCheckedChange={(val) =>
+                onHandleInputChange("includeVideo", val)
+              }
+            />
+          </div>
+
+          {/* ------------- Action Button -------------- */}
+          <Button
+            disabled={loading}
+            onClick={onGenerate}
+            className="w-full btn-primary mt-2"
+          >
+            {loading ? (
+              <>
+                <Loader2Icon className="animate-spin mr-2" /> Generating Curriculum...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" /> Generate Course Layout
+              </>
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

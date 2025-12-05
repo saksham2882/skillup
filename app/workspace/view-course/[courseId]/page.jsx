@@ -1,8 +1,6 @@
-// import { useParams } from "next/navigation"
 import EditCourse from "../../edit-course/[courseId]/page"
 
 const ViewCourse = () => {
-  // const { courseId } = useParams()
 
   return (
     <div>
@@ -10,4 +8,5 @@ const ViewCourse = () => {
     </div>
   )
 }
+
 export default ViewCourse

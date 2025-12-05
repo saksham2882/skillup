@@ -1,88 +1,62 @@
-import { Gift } from "lucide-react";
+import { CheckCircle2, Clock, Gift, Layers } from "lucide-react";
 
 const ChapterTopicList = ({ course }) => {
-  const courseLayout = course?.courseJson?.course;
+    const courseLayout = course?.courseJson?.course;
 
-  return (
-    <div>
-        <h2 className="font-bold text-3xl mt-10">
-            Chapters & Topics
-        </h2>
+    return (
+        <div className="mt-12 max-w-5xl mx-auto">
+            <h2 className="font-bold text-3xl text-white mb-8 flex items-center gap-3">
+                <Layers className="text-cyan-400" /> Curriculum Roadmap
+            </h2>
 
-        <div className="flex flex-col items-center justify-center mt-10">
+            <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-slate-700 before:to-transparent">
+                {courseLayout?.chapters.map((chapter, index) => (
+                    <div
+                        key={index}
+                        className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
+                    >
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-slate-800 group-hover:bg-cyan-600 transition-colors shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow shadow-slate-900 z-10 text-white font-bold text-sm">
+                            {index + 1}
+                        </div>
 
-            {courseLayout?.chapters.map((chapter, chapterIndex) => (
-                <div key={chapterIndex} className="flex flex-col items-center">
-
-                {/* -------- Chapter Card --------- */}
-                <div className="p-4 border shadow rounded-xl bg-primary text-white w-72 text-center">
-                    <h2 className="font-semibold">
-                        Chapter {chapterIndex + 1}
-                    </h2>
-                    <h2 className="font-bold text-lg">
-                        {chapter.chapterName}
-                    </h2>
-
-                    <div className="text-xs flex justify-between mt-1">
-                        <span>Duration: {chapter.duration}</span>
-                        <span>Topics: {chapter.topics.length}</span>
-                    </div>
-                </div>
-
-                {/* ---------- Topics + Timeline ------------ */}
-                <div className="flex flex-col items-center">
-                    {chapter.topics.map((topic, topicIndex) => (
-                        <div key={topicIndex} className="flex flex-col items-center">
-
-                            {/*------- Line above --------- */}
-                            <div className="h-10 w-1 bg-gray-300"></div>
-
-                            {/* ------- Topic Row --------- */}
-                            <div className="flex items-center gap-5">
-                                <span className="max-w-xs text-gray-700 w-32 text-right">
-                                    {topicIndex % 2 === 0 ? topic : ""}
-                                </span>
-
-                                <h2 className="text-center bg-gray-200 text-gray-600 w-14 h-14 flex items-center justify-center rounded-full text-lg font-bold">
-                                    {topicIndex + 1}
-                                </h2>
-
-                                <span className="max-w-xs text-gray-700 w-32 text-left">
-                                    {topicIndex % 2 !== 0 ? topic : ""}
-                                </span>
+                        {/* ------------- Content Card -------------- */}
+                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-900/50 p-6 rounded-2xl border border-white/5 hover:border-cyan-500/30 transition-all shadow-xl backdrop-blur-sm">
+                            <div className="flex flex-col gap-1 mb-4">
+                                <div className="flex justify-between items-start">
+                                    <h3 className="font-bold text-xl text-white">
+                                        {chapter.chapterName}
+                                    </h3>
+                                    <span className="text-xs font-medium text-slate-400 bg-slate-950 px-2 py-1 rounded border border-white/5 flex items-center gap-1">
+                                        <Clock size={12} /> {chapter.duration}
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* --------- Last Topic -> Show Gift icon ----------- */}
-                            {topicIndex === chapter.topics.length - 1 && (
-                                <>
-                                    {/* -------- Line above gift --------- */}
-                                    <div className="h-10 w-1 bg-gray-300"></div>
-
-                                    {/* ---------- Gift Icon Node ----------- */}
-                                    <div className="flex justify-center items-center">
-                                        <div className="w-16 h-16 bg-yellow-100 border border-yellow-300 rounded-full flex justify-center items-center shadow">
-                                            <Gift className="text-yellow-600 w-8 h-8" />
-                                        </div>
+                            <div className="space-y-3">
+                                {chapter.topics.map((topic, i) => (
+                                    <div
+                                        key={i}
+                                        className="flex items-start gap-3 text-sm text-slate-400 group/topic"
+                                    >
+                                        <CheckCircle2 className="w-4 h-4 text-cyan-500/50 mt-0.5 group-hover/topic:text-cyan-400 transition-colors" />
+                                        <span className="group-hover/topic:text-slate-200 transition-colors">
+                                            {topic}
+                                        </span>
                                     </div>
-
-                                    {/* --------- Line below gift ---------- */}
-                                    <div className="h-10 w-1 bg-gray-300"></div>
-                                </>
-                            )}
+                                ))}
+                            </div>
                         </div>
-                    ))}
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex justify-center mt-12">
+                <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-linear-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-400 font-bold tracking-wide">
+                    <Gift size={20} /> Certificate of Completion
                 </div>
             </div>
-        ))}
-
-        {/* ------ Finish ------- */}
-        <div className="p-4 border shadow rounded-xl bg-green-600 text-white mt-5 w-32 text-center">
-            <h2 className="font-bold">Finish</h2>
         </div>
-
-        </div>
-    </div>
-  );
+    );
 };
 
 export default ChapterTopicList;
