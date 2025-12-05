@@ -1,11 +1,12 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion"
-import { Brain, Menu, X } from "lucide-react";
+import { Brain, ExternalLink, Menu, X } from "lucide-react";
 import { navItems } from "@/lib/landing-data";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/landButton";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Navbar = () => {
     const [activeSlide, setActiveSlide] = useState(0);
@@ -71,6 +72,13 @@ const Navbar = () => {
                                 )}
                             </button>
                         ))}
+                        <Link
+                            href={'/coming-soon'}
+                            className="px-3 py-1.5 text-sm font-normal text-cyan-200 rounded-full hover:text-white hover:bg-cyan-500/10 transition-all flex items-center gap-1"
+                        >
+                            <ExternalLink size={14} className="opacity-80 group-hover:opacity-100" />
+                            Coming Soon
+                        </Link>
                         <Button 
                             variant="primary" 
                             className="px-6! py-2! text-sm!"
@@ -111,6 +119,23 @@ const Navbar = () => {
                                 {item}
                             </motion.button>
                         ))}
+                        <div className="absolute bottom-16 w-full flex items-center justify-center flex-col gap-4">
+                            <Link
+                                href={'/coming-soon'}
+                                className="px-3 py-2 text-sm font-normal text-cyan-200 rounded-full hover:text-white bg-cyan-500/10 transition-all flex items-center justify-center gap-1 w-[70%]"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                <ExternalLink size={14} className="opacity-80 group-hover:opacity-100" />
+                                Coming Soon
+                            </Link>
+                            <Button 
+                                variant="primary" 
+                                className="px-6! py-2! text-sm! w-[70%] flex items-center justify-center"
+                                onClick={() => router.push('/sign-in')}
+                            >
+                                Get Started
+                            </Button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

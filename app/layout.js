@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "SkillUp AI - AI Learning Platform",
+  title: "SkillUp AI - NextGen Learning Platform",
   description: "Generate personalized courses with AI",
 };
 

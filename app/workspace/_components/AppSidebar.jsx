@@ -13,10 +13,11 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import {
+  BarChart3,
   Book,
   Compass,
+  GiftIcon,
   LayoutDashboard,
-  PencilRulerIcon,
   Sparkles,
   UserCircle2Icon,
   WalletCards,
@@ -39,14 +40,18 @@ const SideBarOptions = [
     path: "/workspace/my-learning",
   },
   {
-    title: "Explore Courses",
+    title: "Community Courses",
     icon: Compass,
     path: "/workspace/explore",
   },
+  { title: "Analytics", 
+    icon: BarChart3, 
+    path: "/coming-soon" 
+  },
   {
-    title: "AI Tools",
-    icon: PencilRulerIcon,
-    path: "/workspace/ai-tools",
+    title: "Rewards & More",
+    icon: GiftIcon,
+    path: "/coming-soon",
   },
   {
     title: "Billing",
