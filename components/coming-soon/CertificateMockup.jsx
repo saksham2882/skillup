@@ -1,13 +1,21 @@
+"use client"
+
 import { useUser } from "@clerk/nextjs";
 import { ShieldCheck } from "lucide-react";
 
 
 const CertificateMockup = () => {
     const { user, isLoaded } = useUser();
-    const date = new Date()
-    console.log("current date", date.toDateString())
 
-    if (!isLoaded) return null;
+    if (!isLoaded) {
+        return (
+            <div className="relative aspect-16/10 bg-[#0F1623] border border-white/10 rounded-xl p-8 animate-pulse">
+                <div className="h-6 w-24 bg-slate-700 rounded mb-4"></div>
+                <div className="h-10 w-3/4 bg-slate-700 rounded mx-auto"></div>
+            </div>
+        );
+    }
+    
 
     const fullName = user?.fullName ?? "Alex Developer";
     

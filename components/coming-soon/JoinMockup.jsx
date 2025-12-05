@@ -1,3 +1,5 @@
+"use client"
+
 import { ArrowLeft, Bell, CheckCircle2 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -11,7 +13,8 @@ const JoinMockup = () => {
     const [notified, setNotified] = useState(false);
 
     const handleNotify = () => {
-        if (!email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
             toast.error("Please enter a valid email address.");
             return;
         }

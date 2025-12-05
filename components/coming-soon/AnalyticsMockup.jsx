@@ -1,3 +1,5 @@
+"use client"
+
 import { animate, motion, useInView } from "framer-motion";
 import { TrendingUp } from "lucide-react";
 import React from "react";

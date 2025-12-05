@@ -1,3 +1,6 @@
+/* eslint-disable react/no-unescaped-entities */
+"use client"
+
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 
@@ -17,7 +20,7 @@ const QuizMockup = () => {
             </div>
 
             <div className="text-white text-lg font-medium leading-snug">
-                &quot;Which cybersecurity technique is commonly used to detect unauthorized access attempts in a network?&quot;
+                "Which cybersecurity technique is commonly used to detect unauthorized access attempts in a network?"
             </div>
 
             <div className="space-y-3">

@@ -123,6 +123,7 @@ const Navbar = () => {
                             <Link
                                 href={'/coming-soon'}
                                 className="px-3 py-2 text-sm font-normal text-cyan-200 rounded-full hover:text-white bg-cyan-500/10 transition-all flex items-center justify-center gap-1 w-[70%]"
+                                onClick={() => setIsMenuOpen(false)}
                             >
                                 <ExternalLink size={14} className="opacity-80 group-hover:opacity-100" />
                                 Coming Soon

@@ -1,3 +1,5 @@
+"use client"
+
 import { motion } from "framer-motion";
 
 const FeatureSection = ({ title, desc, icon: Icon, align = "left", color = "cyan", children }) => {
@@ -21,7 +23,12 @@ const FeatureSection = ({ title, desc, icon: Icon, align = "left", color = "cyan
                     >
                         <Icon
                             size={28}
-                            className={`text-${color}-400 group-hover:scale-110 transition-transform duration-300`}
+                            className={`${
+                                color === "cyan" ? "text-cyan-400" :
+                                color === "purple" ? "text-purple-400" :
+                                color === "green" ? "text-green-400" :
+                                "text-cyan-400"
+                            } group-hover:scale-110 transition-transform duration-300`}
                         />
                     </div>
 
@@ -38,7 +45,12 @@ const FeatureSection = ({ title, desc, icon: Icon, align = "left", color = "cyan
                         whileInView={{ width: 80 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.5 }}
-                        className={`h-1 bg-linear-to-r from-${color}-500 to-transparent rounded-full`}
+                        className={`h-1 rounded-full ${
+                            color === "cyan" ? "bg-linear-to-r from-cyan-500 to-transparent" :
+                            color === "purple" ? "bg-linear-to-r from-purple-500 to-transparent" :
+                            color === "green" ? "bg-linear-to-r from-green-500 to-transparent" :
+                            "bg-linear-to-r from-cyan-500 to-transparent"
+                        }`}
                     />
                 </motion.div>
 
