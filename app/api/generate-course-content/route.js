@@ -1,105 +1,104 @@
-import { GoogleGenAI } from "@google/genai";
-import { ai } from "../generate-course-layout/route";
 import { NextResponse } from "next/server";
-import axios from "axios";
 import { db } from "@/config/db";
 import { coursesTable } from "@/config/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
+import { GoogleGenAI } from "@google/genai";
+import { CONTENT_PROMPT } from "@/lib/prompt";
+import { cleanAIResponse, getYoutubeVideo } from "@/lib/utils";
+import { currentUser } from "@clerk/nextjs/server";
+import pLimit from 'p-limit';
 
-const PROMPT = `Depends on Chapter name and Topic Generate content for each topic in HTML and give response in JSON format.
-                    Schema: {
-                        chapterName: <>,
-                        {
-                            topic: <>,
-                            content: <>
-                        }
-                    }
-                    :User Input:
-                `
 
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
 
 export async function POST(req) {
-    const { courseJson, courseTitle, courseId } = await req.json()
-
-    const promises = courseJson?.chapters?.map(async (chapter) => {
-
-        const config = {
-            responseMimeType: 'text/plain',
+    try {
+        const user = await currentUser()
+        const email = user?.primaryEmailAddress?.emailAddress
+        if (!email) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const model = "gemini-2.0-flash";
+        const { courseJson, courseId } = await req.json()
 
-        const contents = [
-            {
-                role: 'user',
-                parts: [
-                    {
-                        text: PROMPT + JSON.stringify(chapter)
+        if (!courseJson?.chapters) {
+            return NextResponse.json({ error: "Invalid Course Data" }, { status: 400 });
+        }
+
+        // Verify course ownership
+        const course = await db.query.coursesTable.findFirst({
+            where: and(eq(coursesTable.cid, courseId), eq(coursesTable.userEmail, email))
+        });
+        if (!course) {
+            return NextResponse.json({ error: "Course not found" }, { status: 404 });
+        }
+
+        const limit = pLimit(4);
+
+        // Process Chapters
+        const contentGenerationTasks = courseJson?.chapters.map(async (chapter) => 
+            limit(async () => {
+                try {
+                    // 1. Generate Text Content
+                    const config = { responseMimeType: 'application/json' }
+                    const model = "gemini-2.5-flash";
+                    const contents = [{
+                        role: 'user',
+                        parts: [{ text: CONTENT_PROMPT + JSON.stringify(chapter) }]
+                    }]
+
+                    const aiRes = await ai.models.generateContent({
+                        model,
+                        config,
+                        contents
+                    })
+
+                    const RawResponse = aiRes?.candidates?.[0]?.content?.parts[0]?.text
+                    const contentJson = cleanAIResponse(RawResponse)
+
+                    // 2. Fetch YouTube Video
+                    let videoId = []
+                    try {
+                        videoId = await getYoutubeVideo(chapter.chapterName + " tutorial")
+                    } catch (ytError) {
+                        console.warn(`Youtube fetch failed for ${chapter.chapterName}`, ytError.message)
                     }
-                ]
-            }
-        ]
 
-        const res = await ai.models.generateContent({
-            model,
-            config,
-            contents
+                    return {
+                        courseData: contentJson,
+                        youtubeVideo: videoId
+                    }
+
+                } catch (chapterError) {
+                    console.error(`Failed to generate chapter: ${chapter.chapterName}`, chapterError);
+                    return {
+                        courseData: {
+                            chapterName: chapter.chapterName,
+                            topics: [{ topic: "Error", content: "<p>Content generation failed.</p>" }]
+                        },
+                        youtubeVideo: []
+                    };
+                }
+            })
+        )
+
+        const fullCourseContent = await Promise.all(contentGenerationTasks);
+
+        // Update Database
+        await db.update(coursesTable)
+            .set({ 
+                courseContent: fullCourseContent,
+                isPublished: true 
+            })
+            .where(eq(coursesTable.cid, courseId))
+
+        return NextResponse.json({ 
+            success: true, 
+            content: fullCourseContent 
         })
-
-        // console.log(res?.candidates[0]?.content?.parts[0]?.text)
-        const RawResponse = res?.candidates[0]?.content?.parts[0]?.text
-        const RawJson = RawResponse.replace('```json', '').replace('```', '');
-        const JSONResponse = JSON.parse(RawJson)
-
-        const youtubeData = await GetYoutubeVideo(chapter?.chapterName)
-        console.log({
-            youtubeVideo: youtubeData,
-            courseData: JSONResponse
-        })
-        return {
-            youtubeVideo: youtubeData,
-            courseData: JSONResponse
-        }
-    })
-
-    const CourseContent = await Promise.all(promises)
-
-    // Save to Database
-    const dbResponse = await db.update(coursesTable).set({
-        courseContent: CourseContent
-    }).where(eq(coursesTable.cid, courseId))
-
-    return NextResponse.json({
-        courseName: courseTitle,
-        CourseContent: CourseContent
-    })
-}
-
-
-// Get Youtube Video
-const YOUTUBE_BASE_URL = 'https://www.googleapis.com/youtube/v3/search'
-
-const GetYoutubeVideo = async (topic) => {
-    const params = {
-        part: 'snippet',
-        q: topic,
-        maxResult: 4,
-        type: 'video',
-        key: process.env.YOUTUBE_API_KEY,
+        
+    } catch (error) {
+        console.error("course content error: ", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
-
-    const res = await axios.get(YOUTUBE_BASE_URL, {params})
-    const youtubeVideoListRes = res.data.items;
-    const youtubeVideoList = []
-
-    youtubeVideoListRes.forEach(item => {
-        const data = {
-            videoId: item.id?.videoId,
-            title: item?.snippet?.title
-        }
-        youtubeVideoList.push(data)
-    })
-
-    console.log("youtubeVideoList: ", youtubeVideoList)
-    return youtubeVideoList;
 }

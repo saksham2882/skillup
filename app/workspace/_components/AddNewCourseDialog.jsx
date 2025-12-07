@@ -26,6 +26,7 @@ import { toast } from "sonner";
 
 const AddNewCourseDialog = ({ children }) => {
   const [loading, setLoading] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -58,24 +59,24 @@ const AddNewCourseDialog = ({ children }) => {
         courseId: courseId
       });
 
-      if (res?.data?.response == 'Limit Exceed') {
-        router.push('/workspace/billing')
-        toast.warning("Plan Limit Exceeded. Please Upgrade!");
-        return;
-      }
-
       toast.success("Course Layout Generated!");
       router.push("/workspace/edit-course/" + res?.data?.courseId)
+
     } catch (error) {
+      if (error?.response?.data?.response === "Limit Exceeded") {
+        router.push('/workspace/billing')
+        toast.warning("Free limit reached. Upgrade to Pro to create more.");
+        return;
+      }
       toast.error("Failed to generate course. Please try again.");
-      console.log(error)
     } finally {
       setLoading(false)
+      setDialogOpen(false)
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>

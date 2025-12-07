@@ -4,6 +4,7 @@ import axios from "axios"
 import { BookOpen, Loader2, MoreVertical, PlayCircle, Settings } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -11,6 +12,7 @@ import { toast } from "sonner"
 const CourseCard = ({ course }) => {
     const courseJson = course?.courseJson.course || {}
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
     const bannerImageUrl = course?.bannerImageUrl || '/learning.svg'
 
     const onEnrollCourse = async () => {
@@ -27,6 +29,11 @@ const CourseCard = ({ course }) => {
                 toast.success("Successfully Enrolled!");
             }
         } catch (error) {
+            if (error?.response?.data?.response === "Limit Exceeded") {
+                router.push("/workspace/billing");
+                toast.warning("Free plan can only enroll in 1 course. Upgrade to Pro for unlimited access.");
+                return;
+            }
             toast.error("Something went wrong. Please try again.");
             console.log(error)
         } finally {

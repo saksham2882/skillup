@@ -33,7 +33,7 @@ const Pricing = () => {
                         <AnimatedSection delay={2} className="h-full">
                             <div className="p-8 h-full rounded-3xl bg-slate-900/50 border border-white/10 flex flex-col items-center">
                                 <span className="text-slate-400 font-bold tracking-widest uppercase text-sm mb-4">
-                                    current
+                                    starter
                                 </span>
                                 <div className="text-4xl font-bold text-white mb-2">Free</div>
                                 <p className="text-slate-400 mb-8 text-center">
@@ -67,8 +67,8 @@ const Pricing = () => {
                                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-cyan-500 to-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                                     Most Popular
                                 </div>
-                                <span className="text-cyan-400 font-bold tracking-widest uppercase text-sm mb-4">
-                                    Starter
+                                <span className="text-cyan-400 font-bold tracking-widest uppercase text-lg mb-4">
+                                    Pro
                                 </span>
                                 <div className="text-4xl font-bold text-white mb-2">
                                     $6
