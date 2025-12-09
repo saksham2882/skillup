@@ -142,17 +142,17 @@ The application follows a modern **Serverless Architecture** enabled by Next.js.
     *   As chapters are marked "Complete", the frontend updates certain flags in the DB.
 
 ```mermaid
-graph TD
-    User[User Client] -->       |Auth|          Clerk[Clerk Auth]
-    User              -->    |API Request|      NextAPI[Next.js API Routes]
+flowchart TD
+    User["User Client"] --> |Auth| Clerk["Clerk Auth"]
+    User --> |"API Request"| NextAPI["Next.js API Routes"]
     
-    NextAPI           -->    |Query/Mutate|     DB[(Neon PostgreSQL)]
-    NextAPI           -->    |Generate Text|    Gemini[Google Gemini AI]
-    NextAPI           -->    |Generate Image|   Flux[Flux AI API]
-    NextAPI           -->    |Search Video|     YT[YouTube API]
+    NextAPI --> |"Query/Mutate"| DB[("Neon PostgreSQL")]
+    NextAPI --> |"Generate Text"| Gemini["Google Gemini AI"]
+    NextAPI --> |"Generate Image"| Flux["Flux AI API"]
+    NextAPI --> |"Search Video"| YT["YouTube API"]
     
-    DB                -->    |Return Data|      NextAPI
-    NextAPI           -->    |JSON Response|    User
+    DB --> |"Return Data"| NextAPI
+    NextAPI --> |"JSON Response"| User
 ```
 
 ---
